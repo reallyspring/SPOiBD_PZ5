@@ -1,0 +1,51 @@
+{% load static %}
+<!doctype html>
+<html lang="ru" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Учебное приложение{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'vendor/tabler/css/tabler.min.css' %}"
+    />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <div class="page">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <div class="container-xl">
+          <a class="navbar-brand" href="/profile/">DjangoApp</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbar-menu">
+          <div class="navbar-nav me-auto">
+            <a class="nav-link" href="/profile/">Профиль</a>
+            <a class="nav-link" href="/courses/">Курсы</a>
+            <a class="nav-link" href="/departments/">Факультеты</a>
+            <a class="nav-link" href="/groups/">Учебные группы</a>
+          </div>
+          {% if user.is_authenticated %}
+          <span class="navbar-text me-3">{{ user.username }}</span>
+          <form method="post" action="/accounts/logout/">
+            {% csrf_token %}
+            <button class="btn btn-outline-light btn-sm" type="submit">
+              Выйти
+            </button>
+          </form>
+          {% endif %}
+          </div>
+        </div>
+      </nav>
+      <div class="page-wrapper">
+        <div class="page-bode">
+            <div class="container-xl">
+              {% block content %}{% endblock %}
+            </div>
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'vendor/tabler/js/tabler.min.js' %}"></script>
+  </body>
+</html>

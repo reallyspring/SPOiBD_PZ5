@@ -1,0 +1,52 @@
+:root[data-bs-theme="dark"] {
+    --tblr-body-bg: #0f1220;
+    --tblr-bg-surface: #171b2e;
+    --tblr-bg-surface-secondary: #1c2138;
+    --tblr-bg-surface-tertiary: #1c2138;
+    --tblr-bg-forms: #0f1220;
+    --tblr-border-color: #2b3150;
+    --tblr-border-color-translucent: #2b3150;
+    --tblr-body-color: #dfe3f5;
+    --tblr-secondary: #8f97b8;
+    --tblr-primary: #7c6cf0;
+    --tblr-primary-rgb: 124, 108, 240;
+    --tblr-border-radius: 10px;
+    --tblr-border-radius-lg: 16px;
+}
+
+.card {
+    overflow: hidden;
+}
+
+.card-table th,
+.card-table td {
+    padding: 14px 20px;
+    vertical-align: middle;
+}
+
+.btn {
+    --tblr-btn-padding-x: 20px;
+    --tblr-btn-padding-y: 10px;
+}
+
+.btn-sm {
+    --tblr-btn-padding-x: 12px;
+    --tblr-btn-padding-y: 5px;
+}
+
+.navbar-brand {
+    color: #7c6cf0;
+}
+
+.user-info {
+    padding: 24px;
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: 16px;
+}
+
+form p label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--tblr-secondary);
+}

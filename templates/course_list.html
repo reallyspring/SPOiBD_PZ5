@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Курсы{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <h1 class="mb-0">Список курсов</h1>
+    {% if is_methodist %}
+    <a class="btn btn-primary" href="/courses/add/">
+        Добавить курс
+    </a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-striped card-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Факультет</th>
+                    <th>Описание</th>
+                    {% if is_methodist %}
+                    <th>Действия</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td>{{ course.id }}</td>
+                    <td>{{ course.title }}</td>
+                    <td>{{ course.department.name }}</td>
+                    <td>{{ course.description|default:"Нет описания" }}</td>
+                    {% if is_methodist %}
+                    <td>
+                        <a class="btn btn-sm btn-warning" href="/courses/{{ course.id }}/edit/">
+                            Изменить
+                        </a>
+                        <a class="btn btn-sm btn-danger" href="/courses/{{ course.id }}/delete/">
+                            Удалить
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if is_methodist %}5{% else %}4{% endif %}">
+                        Курсов пока нет.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
