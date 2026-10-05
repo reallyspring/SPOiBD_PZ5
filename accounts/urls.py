@@ -20,7 +20,7 @@ urlpatterns = [
     'departments/add/',
     views.department_create,
     name='department_create'),
-path(
+    path(
     'departments/<int:pk>/edit/',
     views.department_update,
     name='department_update'
@@ -64,5 +64,20 @@ path(
         'courses/<int:pk>/delete/', 
         views.course_delete, 
         name='course_delete'
+        ),
+    path(
+        'dashboards/', 
+        views.dashboard_overview, 
+        name='dashboard_overview'
+        ),
+    path(
+        'dashboards/courses/', 
+        views.dashboard_courses, 
+        name='dashboard_courses'
+        ),
+    path(
+        'dashboards/students/', 
+        views.dashboard_students, 
+        name='dashboard_students'
         ),
 ]

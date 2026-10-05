@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1 class="dash-title">{% block dash_title %}{% endblock %}</h1>
+    
+    <div class="dash-tabs">
+        <a class="dash-tab {% if active == 'overview' %}active{% endif %}" href="/dashboards/">Обзор</a>
+        <a class="dash-tab {% if active == 'courses' %}active{% endif %}" href="/dashboards/courses/">Курсы</a>
+        <a class="dash-tab {% if active == 'students' %}active{% endif %}" href="/dashboards/students/">Студенты</a>
+    </div>
+
+    {% if departments %}
+    <form class="dash-filter" method="get">
+        <select class="form-select" name="department">
+            <option value="">Все факультеты</option>
+            {% for department in departments %}
+            <option value="{{ department.id }}" {% if selected == department.id|stringformat:'s' %}selected{% endif %}>
+                {{ department.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-primary" type="submit">Показать</button>
+    </form>
+    {% endif %}
+
+    <div class="row row-cards mb-3">
+        {% block kpi %}{% endblock %}
+    </div>
+    <div class="row row-cards">
+        {% block charts %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/chart.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

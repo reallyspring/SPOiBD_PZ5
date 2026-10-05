@@ -25,7 +25,7 @@
             <a class="nav-link" href="/courses/">Курсы</a>
             <a class="nav-link" href="/departments/">Факультеты</a>
             <a class="nav-link" href="/groups/">Учебные группы</a>
-          </div>
+            <a class="nav-link" href="/dashboards/">Дашборды</a>          </div>
           {% if user.is_authenticated %}
           <span class="navbar-text me-3">{{ user.username }}</span>
           <form method="post" action="/accounts/logout/">
@@ -39,7 +39,7 @@
         </div>
       </nav>
       <div class="page-wrapper">
-        <div class="page-bode">
+        <div class="page-body">
             <div class="container-xl">
               {% block content %}{% endblock %}
             </div>
@@ -47,5 +47,6 @@
       </div>
     </div>
     <script src="{% static 'vendor/tabler/js/tabler.min.js' %}"></script>
+    {% block scripts %}{% endblock %}
   </body>
 </html>

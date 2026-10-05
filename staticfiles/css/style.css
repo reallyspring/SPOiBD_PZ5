@@ -50,3 +50,62 @@ form p label {
     margin-bottom: 6px;
     color: var(--tblr-secondary);
 }
+
+.dash-title {
+    margin-bottom: 16px;
+    color: #7c6cf0;
+}
+
+.dash-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.dash-tab {
+    padding: 8px 18px;
+    border: 1px solid var(--tblr-border-color);
+    border-radius: 10px;
+    color: var(--tblr-secondary);
+    text-decoration: none;
+}
+
+.dash-tab.active {
+    background: #7c6cf0;
+    border-color: #7c6cf0;
+    color: #fff;
+}
+
+.dash-filter {
+    display: flex;
+    gap: 8px;
+    max-width: 420px;
+    margin-bottom: 16px;
+}
+
+.kpi-card {
+    padding: 18px 20px;
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-left: 4px solid var(--kpi-color);
+    border-radius: 16px;
+}
+
+.kpi-label {
+    color: var(--tblr-secondary);
+}
+
+.kpi-value {
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--kpi-color);
+}
+
+.kpi-violet { --kpi-color: #7c6cf0; }
+.kpi-cyan { --kpi-color: #22d3ee; }
+.kpi-pink { --kpi-color: #f472b6; }
+.kpi-amber { --kpi-color: #fbbf24; }
+
+.chart-box {
+    height: 300px;
+}

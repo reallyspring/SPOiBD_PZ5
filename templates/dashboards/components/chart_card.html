@@ -1,0 +1,11 @@
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">{{ title }}</h3>
+            <div class="chart-box">
+                <canvas class="dash-chart" data-type="{{ type }}" data-source="{{ id }}"></canvas>
+            </div>
+            {{ data|json_script:id }}
+        </div>
+    </div>
+</div>

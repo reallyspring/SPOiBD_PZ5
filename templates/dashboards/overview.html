@@ -1,0 +1,16 @@
+{% extends 'dashboards/layout.html' %}
+
+{% block title %}Дашборд: обзор{% endblock %}
+{% block dash_title %}Обзор сайта{% endblock %}
+
+{% block kpi %}
+    {% include 'dashboards/components/kpi_card.html' with label='Факультеты' value=departments_count color='violet' %}
+    {% include 'dashboards/components/kpi_card.html' with label='Курсы' value=courses_count color='cyan' %}
+    {% include 'dashboards/components/kpi_card.html' with label='Учебные группы' value=groups_count color='pink' %}
+    {% include 'dashboards/components/kpi_card.html' with label='Студенты' value=students_count color='amber' %}
+{% endblock %}
+
+{% block charts %}
+    {% include 'dashboards/components/chart_card.html' with id='courses-chart' type='bar' title='Курсы по факультетам' data=courses_chart %}
+    {% include 'dashboards/components/chart_card.html' with id='students-chart' type='doughnut' title='Студенты по факультетам' data=students_chart %}
+{% endblock %}

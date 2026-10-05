@@ -1,0 +1,15 @@
+{% extends 'dashboards/layout.html' %}
+
+{% block title %}Дашборд: студенты{% endblock %}
+{% block dash_title %}Студенты{% endblock %}
+
+{% block kpi %}
+    {% include 'dashboards/components/kpi_card.html' with label='Студенты' value=students_count color='violet' %}
+    {% include 'dashboards/components/kpi_card.html' with label='Учебные группы' value=groups_count color='cyan' %}
+    {% include 'dashboards/components/kpi_card.html' with label='Студенты без группы' value=no_group_count color='amber' %}
+{% endblock %}
+
+{% block charts %}
+    {% include 'dashboards/components/chart_card.html' with id='groups-chart' type='bar' title='Студенты по группам' data=groups_chart %}
+    {% include 'dashboards/components/chart_card.html' with id='months-chart' type='line' title='Регистрации по месяцам' data=months_chart %}
+{% endblock %}

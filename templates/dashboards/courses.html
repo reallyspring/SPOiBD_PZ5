@@ -1,0 +1,15 @@
+{% extends 'dashboards/layout.html' %}
+
+{% block title %}Дашборд: курсы{% endblock %}
+{% block dash_title %}Курсы{% endblock %}
+
+{% block kpi %}
+    {% include 'dashboards/components/kpi_card.html' with label='Курсы' value=courses_count color='violet' %}
+    {% include 'dashboards/components/kpi_card.html' with label='Записи на курсы' value=enrollments_count color='cyan' %}
+    {% include 'dashboards/components/kpi_card.html' with label='Курсы без описания' value=without_description color='pink' %}
+{% endblock %}
+
+{% block charts %}
+    {% include 'dashboards/components/chart_card.html' with id='top-chart' type='bar' title='Топ-5 курсов по числу студентов' data=top_chart %}
+    {% include 'dashboards/components/chart_card.html' with id='departments-chart' type='doughnut' title='Записи на курсы по факультетам' data=departments_chart %}
+{% endblock %}
