@@ -49,16 +49,17 @@ function showMessage(text, isError = false) {
 
 async function loadCourses() {
     const courses = await apiRequest("/api/courses/");
-    courseSelect.replaceChildren();
-    for (const course of courses) {
-        const option = document.createElement("option");
-        option.value = course.id;
-        option.textContent = `${course.title} (мест: ${course.max_students})`;
-        courseSelect.append(option);
+    if (courseSelect) {
+        courseSelect.replaceChildren();
+        for (const course of courses) {
+            const option = document.createElement("option");
+            option.value = course.id;
+            option.textContent = `${course.title} (мест: ${course.max_students})`;
+            courseSelect.append(option);
+        }
     }
     document.getElementById("kpi-courses").textContent = courses.length;
 }
-
 function createButton(text, className, onClick) {
     const button = document.createElement("button");
     button.className = "btn btn-sm " + className;
@@ -150,20 +151,21 @@ async function deleteEnrollment(enrollmentId, courseTitle) {
     }
 }
 
-form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    try {
-        await apiRequest("/api/enrollments/", {
-            method: "POST",
-            body: JSON.stringify({ course: Number(courseSelect.value) })
-        });
-        showMessage("Заявка успешно подана!");
-        await loadEnrollments();
-    } catch (error) {
-        showMessage("Ошибка: " + error.message, true);
-    }
-});
-
+if (form) {
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+            await apiRequest("/api/enrollments/", {
+                method: "POST",
+                body: JSON.stringify({ course: Number(courseSelect.value) })
+            });
+            showMessage("Заявка успешно подана!");
+            await loadEnrollments();
+        } catch (error) {
+            showMessage("Ошибка: " + error.message, true);
+        }
+    });
+}
 async function initialize() {
     try {
         await loadCourses();
