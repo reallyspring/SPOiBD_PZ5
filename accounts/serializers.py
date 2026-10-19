@@ -38,6 +38,8 @@ class EnrollmentSerializer(serializers.ModelSerializer):
             course = attrs.get('course')
             if Enrollment.objects.filter(student=student, course=course).exists():
                 raise serializers.ValidationError({"course": "Вы уже подали заявку на этот курс."})
+            if attrs.get("status", Enrollment.Status.PENDING) != Enrollment.Status.PENDING:
+                raise serializers.ValidationError({"status": "Новая заявка должна иметь статус «на рассмотрении»."})
         return attrs
 
     def validate_status(self, value):
