@@ -5,6 +5,11 @@ from django.db.models.functions import TruncMonth
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import AcademicGroupForm, CourseForm, DepartmentForm
 from .models import AcademicGroup, Course, Department, StudentProfile
+from rest_framework import viewsets
+from rest_framework.permissions import BasePermission, IsAuthenticated
+from .models import Enrollment
+from .serializers import CourseSerializer, EnrollmentSerializer
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 def is_methodist(user):
     return user.groups.filter(name='Методист').exists()
@@ -328,3 +333,46 @@ def dashboard_students(request):
             },
         }
     )
+
+@login_required
+@ensure_csrf_cookie
+def api_dashboard(request):
+    return render(
+        request,
+        "accounts/dashboard.html",
+        {"is_methodist": is_methodist(request.user)},
+    )
+class IsMethodologist(BasePermission):
+    def has_permission(self, request, view):
+        return request.user and is_methodist(request.user)
+
+
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticated(), IsMethodologist()]
+        return [IsAuthenticated()]
+
+
+class EnrollmentViewSet(viewsets.ModelViewSet):
+    serializer_class = EnrollmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if is_methodist(self.request.user):
+            return Enrollment.objects.all().select_related("course", "student")
+        return Enrollment.objects.filter(student=self.request.user).select_related("course")
+    def get_permissions(self):
+        if self.action == 'create':
+            return [IsAuthenticated()]
+        if self.action in ['update', 'partial_update']:
+            return [IsAuthenticated(), IsMethodologist()]
+        if self.action == 'destroy':
+            return [IsAuthenticated()]
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(student=self.request.user)

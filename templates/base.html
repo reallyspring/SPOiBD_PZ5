@@ -25,7 +25,9 @@
             <a class="nav-link" href="/courses/">Курсы</a>
             <a class="nav-link" href="/departments/">Факультеты</a>
             <a class="nav-link" href="/groups/">Учебные группы</a>
-            <a class="nav-link" href="/dashboards/">Дашборды</a>          </div>
+            <a class="nav-link" href="/dashboards/">Дашборды</a>
+            <a class="nav-link {% if request.path == '/api-dashboard/' %}active{% endif %}" href="{% url 'api_dashboard' %}">Заявки</a>
+          </div>
           {% if user.is_authenticated %}
           <span class="navbar-text me-3">{{ user.username }}</span>
           <form method="post" action="/accounts/logout/">

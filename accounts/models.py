@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.conf import settings
 
 
 class Department(models.Model):
@@ -17,9 +18,40 @@ class Course(models.Model):
         on_delete=models.CASCADE,
         related_name='courses'
     )
-
+    max_students = models.PositiveIntegerField(default=30, verbose_name="Макс. количество студентов")
     def __str__(self):
         return self.title
+
+class Enrollment(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'на рассмотрении'
+        APPROVED = 'approved', 'зачислен'
+        REJECTED = 'rejected', 'отклонено'
+        
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.PROTECT,
+        related_name='groups'
+    )
+
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="enrollments",
+        verbose_name="Студент"
+    )
+    
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.student.username} -> {self.course.title}"
+
 
 
 class AcademicGroup(models.Model):

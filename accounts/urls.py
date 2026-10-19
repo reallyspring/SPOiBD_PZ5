@@ -1,5 +1,8 @@
-from django.urls import path
+from django.db import router
+from django.urls import path, include
 from . import views
+from rest_framework.routers import DefaultRouter
+from .views import CourseViewSet, EnrollmentViewSet
 urlpatterns = [
     path(
     'profile/',
@@ -80,4 +83,17 @@ urlpatterns = [
         views.dashboard_students, 
         name='dashboard_students'
         ),
+    path(
+        'api-dashboard/', 
+        views.api_dashboard, 
+        name='api_dashboard'
+        ),
+]
+
+router = DefaultRouter()
+router.register("courses", CourseViewSet, basename="courses")
+router.register("enrollments", EnrollmentViewSet, basename="enrollments")
+
+urlpatterns += [
+    path("api/", include(router.urls)),
 ]

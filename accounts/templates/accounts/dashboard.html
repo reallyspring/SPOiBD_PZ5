@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Заявки на курсы{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<h1 class="dash-title">
+    {% if is_methodist %}Панель методиста{% else %}Личный кабинет студента{% endif %}
+</h1>
+
+<div id="message" role="status" class="mb-3"></div>
+
+<div class="row row-cards mb-4">
+    <div class="col-sm-6 col-lg-4">
+        <div class="kpi-card kpi-violet">
+            <div class="kpi-label">{% if is_methodist %}Всего заявок{% else %}Мои заявки{% endif %}</div>
+            <div class="kpi-value" id="kpi-total">0</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <div class="kpi-card kpi-amber">
+            <div class="kpi-label">На рассмотрении</div>
+            <div class="kpi-value" id="kpi-pending">0</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <div class="kpi-card kpi-cyan">
+            <div class="kpi-label">Доступно курсов</div>
+            <div class="kpi-value" id="kpi-courses">0</div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h3 class="card-title">Подать заявку на курс</h3>
+    </div>
+    <div class="card-body">
+        <form id="enrollment-form" class="dash-filter">
+            <select id="course-select" class="form-select" required></select>
+            <button class="btn btn-primary" type="submit">Записаться</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h3 class="card-title">
+            {% if is_methodist %}Все заявки студентов{% else %}Мои заявки{% endif %}
+        </h3>
+    </div>
+    <div class="card-body">
+        {% if is_methodist %}
+            <div id="all-enrollments-list"></div>
+        {% else %}
+            <div id="my-enrollments-list"></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'accounts/app.js' %}"></script>
+{% endblock %}
