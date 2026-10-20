@@ -15,15 +15,25 @@ const STATUS_LABELS = {
 };
 
 async function apiRequest(url, options = {}) {
-    const response = await fetch(url, {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrfToken,
-            ...(options.headers || {})
-        },
-        credentials: "same-origin"
-    });
+    let response;
+    try {
+        response = await fetch(url, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+                ...(options.headers || {})
+            },
+            credentials: "same-origin"
+        });
+    } catch (error) {
+        throw new Error("Сервер недоступен. Проверьте подключение к интернету и попробуйте позже.");
+    }
+
+    if (response.status >= 500) {
+        throw new Error("Сервис временно недоступен. Попробуйте позже.");
+    }
+
 
     let data = null;
     if (response.status !== 204) {
