@@ -10,6 +10,13 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 from .models import Enrollment
 from .serializers import CourseSerializer, EnrollmentSerializer
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db import transaction
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.response import Response
+from .models import Book, BookLoan, LoanEvent
+from .serializers import BookLoanSerializer, BookSerializer, LoanEventSerializer
+from . import services
 
 def is_methodist(user):
     return user.groups.filter(name='Методист').exists()
@@ -376,3 +383,84 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(student=self.request.user)
+
+@login_required
+@ensure_csrf_cookie
+def library_page(request):
+    return render(
+        request,
+        "accounts/library.html",
+        {"is_methodist": is_methodist(request.user)},
+    )
+
+
+class BookViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Book.objects.select_related("course").all()
+    serializer_class = BookSerializer
+
+
+class BookLoanViewSet(viewsets.ModelViewSet):
+    serializer_class = BookLoanSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        loans = BookLoan.objects.select_related("book__course", "reader")
+        if not is_methodist(self.request.user):
+            loans = loans.filter(reader=self.request.user)
+
+        if self.action == "list":
+            status = self.request.query_params.get("status")
+            course = self.request.query_params.get("course")
+            if status:
+                if status not in BookLoan.Status.values:
+                    raise ValidationError({"status": "Неизвестный статус в фильтре."})
+                loans = loans.filter(status=status)
+            if course:
+                if not course.isdigit():
+                    raise ValidationError({"course": "Параметр course должен быть числом."})
+                loans = loans.filter(book__course_id=course)
+        return loans
+
+    @transaction.atomic
+    def perform_create(self, serializer):
+        loan = serializer.save(reader=self.request.user)
+        services.log_event(loan, self.request.user, LoanEvent.Action.CREATED)
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        loan = serializer.instance
+        if loan.reader != self.request.user:
+            raise PermissionDenied()
+        if loan.status != BookLoan.Status.REQUESTED:
+            raise ValidationError({"status": "Изменять можно только заявку в статусе «Заявка создана»."})
+        loan = serializer.save()
+        services.log_event(loan, self.request.user, LoanEvent.Action.UPDATED, loan.status)
+
+    def perform_destroy(self, instance):
+        if instance.status not in (BookLoan.Status.REQUESTED, BookLoan.Status.CANCELLED):
+            raise ValidationError({"status": "Удалить можно только новую или отменённую заявку."})
+        instance.delete()
+
+    def _change_status(self, action_name):
+        loan = self.get_object()
+        loan = services.change_loan_status(loan.pk, action_name, self.request.user)
+        return Response(BookLoanSerializer(loan, context={"request": self.request}).data)
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated, IsMethodologist])
+    def issue(self, request, pk=None):
+        return self._change_status("issue")
+
+    @action(detail=True, methods=["post"], url_path="return",
+            permission_classes=[IsAuthenticated, IsMethodologist])
+    def return_book(self, request, pk=None):
+        return self._change_status("return")
+
+    @action(detail=True, methods=["post"])
+    def cancel(self, request, pk=None):
+        return self._change_status("cancel")
+
+    @action(detail=True, methods=["get"])
+    def history(self, request, pk=None):
+        loan = self.get_object()
+        events = loan.events.select_related("actor")
+        return Response(LoanEventSerializer(events, many=True).data)

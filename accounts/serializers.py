@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Course, Enrollment
+from .models import Course, Enrollment, LoanEvent, Book, BookLoan
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -61,3 +61,53 @@ class EnrollmentSerializer(serializers.ModelSerializer):
                 if approved_count >= course.max_students:
                     raise serializers.ValidationError("На курсе не осталось свободных мест.")
         return value
+
+class BookSerializer(serializers.ModelSerializer):
+    course_title = serializers.CharField(source="course.title", read_only=True)
+
+    class Meta:
+        model = Book
+        fields = ("id", "title", "author", "course", "course_title",
+                  "total_copies", "available_copies")
+
+
+class BookLoanSerializer(serializers.ModelSerializer):
+    book_title = serializers.CharField(source="book.title", read_only=True)
+    course_title = serializers.CharField(source="book.course.title", read_only=True)
+    reader_name = serializers.CharField(source="reader.username", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+
+    class Meta:
+        model = BookLoan
+        fields = ("id", "book", "book_title", "course_title", "reader", "reader_name",
+                  "status", "status_display", "comment", "created_at")
+        read_only_fields = ("id", "reader", "status", "created_at")
+
+    def validate(self, attrs):
+        if "status" in self.initial_data:
+            raise serializers.ValidationError(
+                {"status": "Статус меняется только действиями issue, return и cancel."}
+            )
+        return attrs
+
+    def validate_book(self, book):
+        user = self.context["request"].user
+        active = BookLoan.objects.filter(
+            reader=user,
+            book=book,
+            status__in=[BookLoan.Status.REQUESTED, BookLoan.Status.ISSUED],
+        )
+        if self.instance:
+            active = active.exclude(pk=self.instance.pk)
+        if active.exists():
+            raise serializers.ValidationError("У вас уже есть активная заявка на этот учебник.")
+        return book
+
+
+class LoanEventSerializer(serializers.ModelSerializer):
+    action_display = serializers.CharField(source="get_action_display", read_only=True)
+    actor_name = serializers.CharField(source="actor.username", read_only=True)
+
+    class Meta:
+        model = LoanEvent
+        fields = ("id", "action", "action_display", "old_status", "new_status", "actor_name", "created_at")

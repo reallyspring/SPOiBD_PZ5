@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Библиотека{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<h1 class="dash-title">
+    {% if is_methodist %}Выдача учебников{% else %}Учебники по моим курсам{% endif %}
+</h1>
+
+<div id="message" role="status" class="mb-3"></div>
+
+{% if not is_methodist %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h3 class="card-title">Новая заявка на учебник</h3>
+    </div>
+    <div class="card-body">
+        <form id="loan-form" class="row g-2">
+            <div class="col-md-5">
+                <select id="book-select" class="form-select" required></select>
+            </div>
+            <div class="col-md-5">
+                <input id="loan-comment" class="form-control" maxlength="255"
+                       placeholder="Комментарий (необязательно)">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" type="submit">Создать</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<div class="row row-cards">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{% if is_methodist %}Все заявки{% else %}Мои заявки{% endif %}</h3>
+                <div class="card-actions d-flex gap-2">
+                    <select id="filter-status" class="form-select form-select-sm">
+                        <option value="">Все статусы</option>
+                        <option value="requested">Заявка создана</option>
+                        <option value="issued">Выдан</option>
+                        <option value="returned">Возвращён</option>
+                        <option value="cancelled">Отменена</option>
+                    </select>
+                    <select id="filter-course" class="form-select form-select-sm">
+                        <option value="">Все курсы</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body" id="loan-list"></div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Карточка заявки</h3>
+            </div>
+            <div class="card-body" id="loan-card"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'accounts/api.js' %}"></script>
+<script src="{% static 'accounts/library.js' %}"></script>
+{% endblock %}

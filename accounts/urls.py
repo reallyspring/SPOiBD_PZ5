@@ -2,7 +2,7 @@ from django.db import router
 from django.urls import path, include
 from . import views
 from rest_framework.routers import DefaultRouter
-from .views import CourseViewSet, EnrollmentViewSet
+from .views import CourseViewSet, EnrollmentViewSet, BookLoanViewSet, BookViewSet
 urlpatterns = [
     path(
     'profile/',
@@ -88,11 +88,18 @@ urlpatterns = [
         views.api_dashboard, 
         name='api_dashboard'
         ),
+    path(
+        'library/', 
+        views.library_page, 
+        name='library'
+        ),
 ]
 
 router = DefaultRouter()
 router.register("courses", CourseViewSet, basename="courses")
 router.register("enrollments", EnrollmentViewSet, basename="enrollments")
+router.register("books", BookViewSet, basename="books")
+router.register("loans", BookLoanViewSet, basename="loans")
 
 urlpatterns += [
     path("api/", include(router.urls)),

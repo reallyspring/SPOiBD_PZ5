@@ -1,10 +1,13 @@
 from django.contrib import admin
 from .models import (
- AcademicGroup,
- Course,
- Department,
- Enrollment,
- StudentProfile,
+    AcademicGroup,
+    Course,
+    Department,
+    Enrollment,
+    StudentProfile,
+    Book,
+    BookLoan,
+    LoanEvent,
 )
 @admin.register(AcademicGroup)
 class AcademicGroupAdmin(admin.ModelAdmin):
@@ -44,4 +47,21 @@ class StudentProfileAdmin(admin.ModelAdmin):
     list_filter = ('department',)
     search_fields = ('user__username',)
     filter_horizontal = ('courses',)
-    
+
+@admin.register(Book)
+class BookAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "course", "total_copies", "available_copies")
+    list_filter = ("course",)
+
+
+@admin.register(BookLoan)
+class BookLoanAdmin(admin.ModelAdmin):
+    list_display = ("id", "reader", "book", "status", "created_at")
+    list_filter = ("status", "book__course")
+
+
+@admin.register(LoanEvent)
+class LoanEventAdmin(admin.ModelAdmin):
+    list_display = ("id", "loan", "action", "old_status", "new_status", "actor", "created_at")
+    list_filter = ("action",)
+

@@ -91,3 +91,87 @@ class StudentProfile(models.Model):
     )
     def __str__(self):
         return self.user.username
+
+class Book(models.Model):
+    title = models.CharField("Название", max_length=200)
+    author = models.CharField("Автор", max_length=200, blank=True)
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.PROTECT,
+        related_name="books",
+        verbose_name="Курс",
+    )
+    total_copies = models.PositiveIntegerField("Всего экземпляров", default=1)
+    available_copies = models.PositiveIntegerField("Свободно экземпляров", default=1)
+
+    def __str__(self):
+        return self.title
+
+
+class BookLoan(models.Model):
+    class Status(models.TextChoices):
+        REQUESTED = "requested", "Заявка создана"
+        ISSUED = "issued", "Выдан"
+        RETURNED = "returned", "Возвращён"
+        CANCELLED = "cancelled", "Отменена"
+
+    book = models.ForeignKey(
+        Book,
+        on_delete=models.PROTECT,
+        related_name="loans",
+        verbose_name="Учебник",
+    )
+    reader = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="book_loans",
+        verbose_name="Читатель",
+    )
+    status = models.CharField(
+        "Статус",
+        max_length=20,
+        choices=Status.choices,
+        default=Status.REQUESTED,
+    )
+    comment = models.CharField("Комментарий", max_length=255, blank=True)
+    created_at = models.DateTimeField("Создана", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.reader.username} -> {self.book.title}"
+
+
+class LoanEvent(models.Model):
+    class Action(models.TextChoices):
+        CREATED = "created", "Заявка создана"
+        UPDATED = "updated", "Заявка изменена"
+        ISSUED = "issued", "Учебник выдан"
+        RETURNED = "returned", "Учебник возвращён"
+        CANCELLED = "cancelled", "Заявка отменена"
+
+    loan = models.ForeignKey(
+        BookLoan,
+        on_delete=models.CASCADE,
+        related_name="events",
+        verbose_name="Заявка",
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Инициатор",
+    )
+    action = models.CharField("Событие", max_length=20, choices=Action.choices)
+    old_status = models.CharField("Старый статус", max_length=20, blank=True)
+    new_status = models.CharField("Новый статус", max_length=20)
+    created_at = models.DateTimeField("Время", auto_now_add=True)
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return f"{self.loan_id}: {self.action}"
+
+
