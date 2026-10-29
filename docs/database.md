@@ -4,62 +4,7 @@
 
 ## Схема моделей
 
-```mermaid
-erDiagram
-    Department ||--o{ Course : "courses"
-    Department ||--o{ AcademicGroup : "groups"
-    Department |o--o{ StudentProfile : "students"
-    AcademicGroup |o--o{ StudentProfile : "students"
-    User ||--o| StudentProfile : "student_profile"
-    StudentProfile }o--o{ Course : "courses"
-    Course ||--o{ Enrollment : "заявки на курс"
-    User ||--o{ Enrollment : "enrollments"
-    Course ||--o{ Book : "books"
-    Book ||--o{ BookLoan : "loans"
-    User ||--o{ BookLoan : "book_loans"
-    BookLoan ||--o{ LoanEvent : "events"
-    User |o--o{ LoanEvent : "инициатор"
-
-    Course {
-        int id PK
-        string title
-        text description
-        int department_id FK
-        int max_students
-    }
-    Enrollment {
-        int id PK
-        int course_id FK
-        int student_id FK
-        string status
-        datetime created_at
-    }
-    Book {
-        int id PK
-        string title
-        string author
-        int course_id FK
-        int total_copies
-        int available_copies
-    }
-    BookLoan {
-        int id PK
-        int book_id FK
-        int reader_id FK
-        string status
-        string comment
-        datetime created_at
-    }
-    LoanEvent {
-        int id PK
-        int loan_id FK
-        int actor_id FK
-        string action
-        string old_status
-        string new_status
-        datetime created_at
-    }
-```
+![Схема моделей базы данных](img/database.png)
 
 ## Сущности
 

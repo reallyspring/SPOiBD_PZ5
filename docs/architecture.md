@@ -2,26 +2,7 @@
 
 ## Компоненты
 
-```mermaid
-flowchart LR
-    B["Браузер<br/>Tabler + JavaScript (fetch)"]
-    subgraph Render["Render (или локальный компьютер)"]
-        P["HTTPS-прокси Render"]
-        G["Gunicorn<br/>(локально: runserver)"]
-        subgraph D["Django"]
-            W["WhiteNoise<br/>статические файлы"]
-            V["Страницы<br/>views + шаблоны"]
-            A["REST API<br/>DRF: ViewSet → сериализатор → services"]
-            O["Django ORM"]
-        end
-    end
-    DB[("PostgreSQL на Render<br/>(локально: SQLite)")]
-    B -- "HTTPS: HTML, JSON, cookie сессии, X-CSRFToken" --> P --> G --> D
-    W -. "CSS, JS" .-> B
-    V --> O
-    A --> O
-    O -- SQL --> DB
-```
+![Архитектура приложения](img/architecture.png)
 
 | Компонент | Где находится | Что делает |
 |---|---|---|
